@@ -43,7 +43,6 @@ class ModelTrainer:
                   train_dataset=dataset_samsum_pt["train"], 
                   eval_dataset=dataset_samsum_pt["validation"])
 
-        torch.mps.empty_cache()
         trainer.train()
 
         ## Save model
