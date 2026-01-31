@@ -1,3 +1,4 @@
+import os
 from textSummarizer.constant import *
 from textSummarizer.utils.common import read_yaml, create_directories
 from pathlib import Path
@@ -21,10 +22,9 @@ class ConfigurationManager:
         config = self.config.data_ingestion
 
         data_ingestion_config = DataIngestionConfig(
-            root_dir=Path(config.root_dir),
-            source_URL=config.source_URL,
-            local_data_file=Path(config.local_data_file),
-            unzip_dir=Path(config.unzip_dir),
+            root_dir = Path(config.root_dir),
+            repo_id = config.repo_id,
+            local_dir_use_symlinks = config.local_dir_use_symlinks,
         )
 
         return data_ingestion_config
@@ -32,12 +32,13 @@ class ConfigurationManager:
     def get_data_validation_config(self) -> DataValidationConfig:
         config = self.config.data_validation
 
-        create_directories([config.root_dir])
+        os.makedirs(os.path.dirname(config.STATUS_FILE), exist_ok=True)
 
         data_validation_config = DataValidationConfig(
             root_dir=Path(config.root_dir),
             STATUS_FILE=config.STATUS_FILE,
             ALL_REQUIRED_FILES=config.ALL_REQUIRED_FILES,
+            ALL_REQUIRED_COLUMNS=config.ALL_REQUIRED_COLUMNS,
         )
 
         return data_validation_config
@@ -51,30 +52,32 @@ class ConfigurationManager:
             data_path=Path(config.data_path),
             tokenizer_path=Path(config.tokenizer_path),
         )
-        return data_transformation_config
+        return data_transformation_config 
     
     def get_model_trainer_config(self) -> ModelTrainerConfig:
         config = self.config.model_trainer
-        params = self.params.TrainingArguments
+        train_params = self.params.TrainingArguments
+        lora_params = self.params.LoRAConfig
 
         create_directories([config.root_dir])
 
         model_trainer_config = ModelTrainerConfig(
             root_dir=config.root_dir,
             data_path=config.data_path,
-            model_ckpt = config.model_ckpt,
-            num_train_epochs = params.num_train_epochs,
-            warmup_steps = params.warmup_steps,
-            per_device_train_batch_size = params.per_device_train_batch_size,
-            weight_decay = params.weight_decay,
-            logging_steps = params.logging_steps,
-            eval_strategy = params.eval_strategy,
-            eval_steps = params.eval_steps,
-            save_steps = params.save_steps,
-            gradient_accumulation_steps = params.gradient_accumulation_steps,
-            fp16=True,
-            optim="adafactor"
-            
+            model_ckpt=config.model_ckpt,
+            num_train_epochs=train_params.num_train_epochs,
+            per_device_train_batch_size=train_params.per_device_train_batch_size,
+            per_device_eval_batch_size=train_params.per_device_eval_batch_size,
+            weight_decay=train_params.weight_decay,
+            logging_steps=train_params.logging_steps,
+            eval_strategy=train_params.eval_strategy,
+            save_strategy=train_params.save_strategy,
+            learning_rate=train_params.learning_rate,
+            lora_r=lora_params.lora_r,
+            lora_alpha=lora_params.lora_alpha,
+            lora_dropout=lora_params.lora_dropout,
+            lora_target_modules=lora_params.lora_target_modules,
+            seed=train_params.seed
         )
 
         return model_trainer_config
@@ -87,10 +90,8 @@ class ConfigurationManager:
         model_evaluation_config = ModelEvaluationConfig(
             root_dir=config.root_dir,
             data_path=config.data_path,
-            model_path = config.model_path,
-            tokenizer_path = config.tokenizer_path,
-            metric_file_name = config.metric_file_name
-           
+            metric_file_name=config.metric_file_name,
+            base_model_path=config.base_model_path
         )
 
         return model_evaluation_config

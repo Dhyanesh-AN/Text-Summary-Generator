@@ -1,3 +1,4 @@
+from networkx import config
 from textSummarizer.config.configuration import ConfigurationManager
 from textSummarizer.components.data_validation import DataValidation
 from textSummarizer.logging import logger
@@ -11,3 +12,5 @@ class DataValidationPipeline:
         data_validation_config = config.get_data_validation_config()
         data_validation = DataValidation(config=data_validation_config)
         data_validation.validate_all_files_exist()
+        data_validation.validate_all_columns()
+        data_validation.validate_missing_values()

@@ -14,6 +14,8 @@ torch
 notebook
 boto3
 mypy-boto3-s3
+dotenv
+peft
 python-box==6.0.2
 ensure==1.0.2
 fastapi==0.78.0
