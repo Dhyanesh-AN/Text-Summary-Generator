@@ -6,7 +6,7 @@ TrainingArguments:
   logging_steps: 200
   eval_strategy: steps
   save_strategy: steps
-  learning_rate: 2e-4
+  learning_rate: 0.0002
   seed: 42
 
 LoRAConfig:

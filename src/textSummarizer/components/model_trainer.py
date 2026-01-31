@@ -121,13 +121,15 @@ class ModelTrainer:
             result["gen_len"] = np.mean([len(tokenizer.encode(p)) for p in preds])
             return result
         
+        train_dataset = dataset_samsum_pt["train"].select(range(10))
+        eval_dataset = dataset_samsum_pt["validation"].select(range(10))
         # Seq2SeqTrainer
         trainer = Seq2SeqTrainer(
             model=model,
             args=training_args,
-            train_dataset=dataset_samsum_pt["train"],
-            eval_dataset=dataset_samsum_pt["validation"],
-            tokenizer=tokenizer,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
+            processing_class=tokenizer,
             data_collator=seq2seq_data_collator,
             compute_metrics=compute_metrics
         )

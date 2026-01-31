@@ -41,19 +41,20 @@ class ModelEvaluation:
         rouge = evaluate.load("rouge")
         
         # Get test dataset (use smaller subset if needed for faster evaluation)
-        test_dataset = dataset_samsum_pt["test"]
+        test_dataset = dataset_samsum_pt["test"].select(range(10))
+
+
         
         predictions = []
         references = []
         
         # Generate predictions on test set
         for example in tqdm(test_dataset, desc="Evaluating"):
-            inputs = tokenizer(
-                example["input_ids"],
-                return_tensors="pt",
-                max_length=1024,
-                truncation=True
-            ).to(device)
+            inputs = {
+                "input_ids": torch.tensor(example["input_ids"]).unsqueeze(0).to(device),
+                "attention_mask": torch.tensor(example["attention_mask"]).unsqueeze(0).to(device)
+            }
+
             
             # Generate summary
             summary_ids = model.generate(
