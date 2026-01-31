@@ -41,7 +41,7 @@ class ModelEvaluation:
         rouge = evaluate.load("rouge")
         
         # Get test dataset (use smaller subset if needed for faster evaluation)
-        test_dataset = dataset_samsum_pt["test"].select(range(10))
+        test_dataset = dataset_samsum_pt["test"]
 
 
         
