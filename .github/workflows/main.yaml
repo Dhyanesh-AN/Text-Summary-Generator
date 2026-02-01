@@ -95,7 +95,7 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
             --name=text-summarizer \
-            --env-file /home/ec2-user/.env \
+            --env-file /home/ubuntu/github-runner/.env \
             ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
       - name: Clean previous images and containers
